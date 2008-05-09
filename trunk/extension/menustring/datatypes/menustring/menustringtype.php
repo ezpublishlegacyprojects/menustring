@@ -380,7 +380,7 @@ class MenuStringType extends eZDataType
      \param contentobject attribute object
      \param ezdomnode object
     */
-    function unserializeContentObjectAttribute( &$package, &$objectAttribute, $attributeNode )
+    function unserializeContentObjectAttribute( $package, $objectAttribute, $attributeNode )
     {
         $textNode = $attributeNode->elementByName( 'menu-text' );
         if ( is_object( $textNode ) )
