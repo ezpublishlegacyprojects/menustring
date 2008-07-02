@@ -25,7 +25,7 @@ class MenuStringType extends eZDataType
     /*!
      Sets the default value.
     */
-    function initializeObjectAttribute( &$contentObjectAttribute, $currentVersion, &$originalContentObjectAttribute )
+    function initializeObjectAttribute( $contentObjectAttribute, $currentVersion, $originalContentObjectAttribute )
     {
         if ( $currentVersion != false )
         {
@@ -37,7 +37,7 @@ class MenuStringType extends eZDataType
         }
         else
         {
-            $contentClassAttribute =& $contentObjectAttribute->contentClassAttribute();
+            $contentClassAttribute = $contentObjectAttribute->contentClassAttribute();
             $default = $contentClassAttribute->attribute( "data_text1" );
             if ( $default !== "" )
             {
@@ -49,19 +49,19 @@ class MenuStringType extends eZDataType
     /*!
      \reimp
     */
-    function validateObjectAttributeHTTPInput( &$http, $base, &$contentObjectAttribute )
+    function validateObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         return $this->validateAttributeHTTPInput( $http, $base, $contentObjectAttribute, false );
     }
 
     /*!
     */
-    function validateAttributeHTTPInput( &$http, $base, &$contentObjectAttribute, $isInformationCollector )
+    function validateAttributeHTTPInput( $http, $base, $contentObjectAttribute, $isInformationCollector )
     {
         if ( $http->hasPostVariable( $base . '_menustring_data_text_' . $contentObjectAttribute->attribute( 'id' ) ) )
         {
-            $data =& $http->postVariable( $base . '_menustring_data_text_' . $contentObjectAttribute->attribute( 'id' ) );
-            $classAttribute =& $contentObjectAttribute->contentClassAttribute();
+            $data = $http->postVariable( $base . '_menustring_data_text_' . $contentObjectAttribute->attribute( 'id' ) );
+            $classAttribute = $contentObjectAttribute->contentClassAttribute();
             if ( $isInformationCollector == $classAttribute->attribute( 'is_information_collector' ) )
             {
                 if ( $contentObjectAttribute->validateIsRequired() )
@@ -75,7 +75,7 @@ class MenuStringType extends eZDataType
                 }
             }
             $maxLen = $classAttribute->attribute( EZ_DATATYPESTRING_MENUSTRING_MAX_LEN_FIELD );
-            $textCodec =& eZTextCodec::instance( false );
+            $textCodec = eZTextCodec::instance( false );
             if ( ($textCodec->strlen( $data ) <= $maxLen ) || ( $maxLen == 0 ) )
                 return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
             $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes',
@@ -92,11 +92,11 @@ class MenuStringType extends eZDataType
     /*!
      Fetches the http post var string input and stores it in the data instance.
     */
-    function fetchObjectAttributeHTTPInput( &$http, $base, &$contentObjectAttribute )
+    function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         if ( $http->hasPostVariable( $base . '_menustring_data_text_' . $contentObjectAttribute->attribute( 'id' ) ) )
         {
-            $data =& $http->postVariable( $base . '_menustring_data_text_' . $contentObjectAttribute->attribute( 'id' ) );
+            $data = $http->postVariable( $base . '_menustring_data_text_' . $contentObjectAttribute->attribute( 'id' ) );
             $contentObjectAttribute->setAttribute( 'data_text', $data );
             return true;
         }
@@ -106,7 +106,7 @@ class MenuStringType extends eZDataType
     /*!
      \reimp
     */
-    function validateCollectionAttributeHTTPInput( &$http, $base, &$contentObjectAttribute )
+    function validateCollectionAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         return $this->validateAttributeHTTPInput( $http, $base, $contentObjectAttribute, true );
     }
@@ -114,9 +114,9 @@ class MenuStringType extends eZDataType
     /*!
      Fetches the http post variables for collected information
     */
-    function fetchCollectionAttributeHTTPInput( &$collection, &$collectionAttribute, &$http, $base, &$contentObjectAttribute )
+    function fetchCollectionAttributeHTTPInput( $collection, $collectionAttribute, $http, $base, $contentObjectAttribute )
     {
-        $dataText =& $http->postVariable( $base . "_menustring_data_text_" . $contentObjectAttribute->attribute( "id" ) );
+        $dataText = $http->postVariable( $base . "_menustring_data_text_" . $contentObjectAttribute->attribute( "id" ) );
 
         $collectionAttribute->setAttribute( 'data_text', $dataText );
 
@@ -127,7 +127,7 @@ class MenuStringType extends eZDataType
      Does nothing since it uses the data_text field in the content object attribute.
      See fetchObjectAttributeHTTPInput for the actual storing.
     */
-    function storeObjectAttribute( &$attribute )
+    function storeObjectAttribute( $attribute )
     {
     }
 
@@ -144,8 +144,8 @@ class MenuStringType extends eZDataType
      \reimp
      Inserts the string \a $string in the \c 'data_text' database field.
     */
-    function insertSimpleString( &$object, $objectVersion, $objectLanguage,
-                                 &$objectAttribute, $string,
+    function insertSimpleString( $object, $objectVersion, $objectLanguage,
+                                 $objectAttribute, $string,
                                  &$result )
     {
         $result = array( 'errors' => array(),
@@ -155,18 +155,18 @@ class MenuStringType extends eZDataType
         return true;
     }
 
-    function storeClassAttribute( &$attribute, $version )
+    function storeClassAttribute( $attribute, $version )
     {
     }
 
-    function storeDefinedClassAttribute( &$attribute )
+    function storeDefinedClassAttribute( $attribute )
     {
     }
 
     /*!
      \reimp
     */
-    function validateClassAttributeHTTPInput( &$http, $base, &$classAttribute )
+    function validateClassAttributeHTTPInput( $http, $base, $classAttribute )
     {
         $maxLenName = $base . EZ_DATATYPESTRING_MENUSTRING_MAX_LEN_VARIABLE . $classAttribute->attribute( 'id' );
         if ( $http->hasPostVariable( $maxLenName ) )
@@ -191,7 +191,7 @@ class MenuStringType extends eZDataType
     /*!
      \reimp
     */
-    function fixupClassAttributeHTTPInput( &$http, $base, &$classAttribute )
+    function fixupClassAttributeHTTPInput( $http, $base, $classAttribute )
     {
         $maxLenName = $base . EZ_DATATYPESTRING_MENUSTRING_MAX_LEN_VARIABLE . $classAttribute->attribute( 'id' );
         if ( $http->hasPostVariable( $maxLenName ) )
@@ -206,7 +206,7 @@ class MenuStringType extends eZDataType
     /*!
      \reimp
     */
-    function fetchClassAttributeHTTPInput( &$http, $base, &$classAttribute )
+    function fetchClassAttributeHTTPInput( $http, $base, $classAttribute )
     {
         $maxLenName = $base . EZ_DATATYPESTRING_MENUSTRING_MAX_LEN_VARIABLE . $classAttribute->attribute( 'id' );
         $defaultValueName = $base . EZ_DATATYPESTRING_MENUSTRING_DEFAULT_STRING_VARIABLE . $classAttribute->attribute( 'id' );
@@ -253,7 +253,7 @@ class MenuStringType extends eZDataType
     /*!
      Returns the content.
     */
-    function &objectAttributeContent( &$contentObjectAttribute )
+    function objectAttributeContent( $contentObjectAttribute )
     {
         $return = array( 'raw_data' => $contentObjectAttribute->attribute( 'data_text' ),
                       'menu_text' => MenuStringType::clean( $contentObjectAttribute->attribute( 'data_text' ), 'menu' ),
@@ -265,7 +265,7 @@ class MenuStringType extends eZDataType
     /*!
      Returns the meta data used for storing search indeces.
     */
-    function metaData( &$contentObjectAttribute )
+    function metaData( $contentObjectAttribute )
     {
         return MenuStringType::clean( $contentObjectAttribute->attribute( 'data_text' ) , "meta" );
     }
@@ -273,12 +273,12 @@ class MenuStringType extends eZDataType
     /*!
      Returns the content of the string for use as a title
     */
-    function title( &$contentObjectAttribute )
+    function title( $contentObjectAttribute, $name = null )
     {
         return MenuStringType::clean( $contentObjectAttribute->attribute( 'data_text' ) );
     }
 
-    function hasObjectAttributeContent( &$contentObjectAttribute )
+    function hasObjectAttributeContent( $contentObjectAttribute )
     {
         return trim( MenuStringType::clean( $contentObjectAttribute->attribute( 'data_text' ) ) ) != '';
     }
@@ -302,10 +302,10 @@ class MenuStringType extends eZDataType
     /*!
      \reimp
     */
-    function sortKey( &$contentObjectAttribute )
+    function sortKey( $contentObjectAttribute )
     {
         include_once( 'lib/ezi18n/classes/ezchartransform.php' );
-        $trans =& eZCharTransform::instance();
+        $trans = eZCharTransform::instance();
         return $trans->transformByGroup( $contentObjectAttribute->attribute( 'data_text' ), 'lowercase' );
     }
 
@@ -320,7 +320,7 @@ class MenuStringType extends eZDataType
     /*!
      \reimp
     */
-    function serializeContentClassAttribute( &$classAttribute, &$attributeNode, &$attributeParametersNode )
+    function serializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
     {
         $maxLength = $classAttribute->attribute( EZ_DATATYPESTRING_MENUSTRING_MAX_LEN_FIELD );
         $defaultString = $classAttribute->attribute( EZ_DATATYPESTRING_MENUSTRING_DEFAULT_STRING_FIELD );
@@ -334,7 +334,7 @@ class MenuStringType extends eZDataType
     /*!
      \reimp
     */
-    function unserializeContentClassAttribute( &$classAttribute, &$attributeNode, &$attributeParametersNode )
+    function unserializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
     {
         $maxLength = $attributeParametersNode->elementTextContentByName( 'max-length' );
         $defaultString = $attributeParametersNode->elementTextContentByName( 'default-string' );
@@ -347,7 +347,7 @@ class MenuStringType extends eZDataType
 
      \return a DOM representation of the content object attribute
     */
-    function &serializeContentObjectAttribute( &$package, &$objectAttribute )
+    function serializeContentObjectAttribute( $package, $objectAttribute )
     {
         $node = new eZDOMNode();
 
