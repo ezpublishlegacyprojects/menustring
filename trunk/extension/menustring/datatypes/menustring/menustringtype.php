@@ -8,7 +8,7 @@ include_once( 'kernel/common/i18n.php' );
 class MenuStringType extends eZDataType
 {
 	const EZ_DATATYPESTRING_MENUSTRING = 'menustring';
-	const EZ_DATATYPESTRING_MENUSTRING_MAX_LEN_FIELD = '_menustring_max_string_length_';
+	const EZ_DATATYPESTRING_MENUSTRING_MAX_LEN_FIELD = 'data_int1';
 	const EZ_DATATYPESTRING_MENUSTRING_MAX_LEN_VARIABLE = '_menustring_max_string_length_';
 	const EZ_DATATYPESTRING_MENUSTRING_DEFAULT_STRING_FIELD = 'data_text1';
 	const EZ_DATATYPESTRING_MENUSTRING_DEFAULT_STRING_VARIABLE = '_menustring_default_value_';
