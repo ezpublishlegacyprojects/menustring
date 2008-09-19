@@ -70,7 +70,7 @@ class MenuStringType extends eZDataType
                     }
                 }
             }
-            $maxLen = $classAttribute->attribute( MenuStringType::DATA_TYPE_STRING_MAX_LEN_FIELD );
+            $maxLen = $classAttribute->attribute( MenuStringType::MAX_LEN_FIELD );
             $textCodec = eZTextCodec::instance( false );
             if ( ($textCodec->strlen( $data ) <= $maxLen ) || ( $maxLen == 0 ) )
                 return eZInputValidator::STATE_ACCEPTED;
@@ -164,7 +164,7 @@ class MenuStringType extends eZDataType
     */
     function validateClassAttributeHTTPInput( $http, $base, $classAttribute )
     {
-        $maxLenName = $base . MenuStringType::DATA_TYPE_STRING_MAX_LEN_VARIABLE . $classAttribute->attribute( 'id' );
+        $maxLenName = $base . MenuStringType::MAX_LEN_VARIABLE . $classAttribute->attribute( 'id' );
         if ( $http->hasPostVariable( $maxLenName ) )
         {
             $maxLenValue = $http->postVariable( $maxLenName );
@@ -189,7 +189,7 @@ class MenuStringType extends eZDataType
     */
     function fixupClassAttributeHTTPInput( $http, $base, $classAttribute )
     {
-        $maxLenName = $base . MenuStringType::DATA_TYPE_STRING_MAX_LEN_VARIABLE . $classAttribute->attribute( 'id' );
+        $maxLenName = $base . MenuStringType::MAX_LEN_VARIABLE . $classAttribute->attribute( 'id' );
         if ( $http->hasPostVariable( $maxLenName ) )
         {
             $maxLenValue = $http->postVariable( $maxLenName );
@@ -204,18 +204,18 @@ class MenuStringType extends eZDataType
     */
     function fetchClassAttributeHTTPInput( $http, $base, $classAttribute )
     {
-        $maxLenName = $base . MenuStringType::DATA_TYPE_STRING_MAX_LEN_VARIABLE . $classAttribute->attribute( 'id' );
-        $defaultValueName = $base . MenuStringType::DATA_TYPE_STRING_DEFAULT_STRING_VARIABLE . $classAttribute->attribute( 'id' );
+        $maxLenName = $base . MenuStringType::MAX_LEN_VARIABLE . $classAttribute->attribute( 'id' );
+        $defaultValueName = $base . MenuStringType::DEFAULT_STRING_VARIABLE . $classAttribute->attribute( 'id' );
         if ( $http->hasPostVariable( $maxLenName ) )
         {
             $maxLenValue = $http->postVariable( $maxLenName );
-            $classAttribute->setAttribute( MenuStringType::DATA_TYPE_STRING_MAX_LEN_FIELD, $maxLenValue );
+            $classAttribute->setAttribute( MenuStringType::MAX_LEN_FIELD, $maxLenValue );
         }
         if ( $http->hasPostVariable( $defaultValueName ) )
         {
             $defaultValueValue = $http->postVariable( $defaultValueName );
 
-            $classAttribute->setAttribute( MenuStringType::DATA_TYPE_STRING_DEFAULT_STRING_FIELD, $defaultValueValue );
+            $classAttribute->setAttribute( MenuStringType::DEFAULT_STRING_FIELD, $defaultValueValue );
         }
         return true;
     }
