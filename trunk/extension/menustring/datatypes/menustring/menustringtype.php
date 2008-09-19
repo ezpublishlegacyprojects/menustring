@@ -1,24 +1,20 @@
 <?php
 
-include_once( 'kernel/classes/ezdatatype.php' );
-include_once( 'lib/ezutils/classes/ezintegervalidator.php' );
-include_once( 'kernel/common/i18n.php' );
-
-
 class MenuStringType extends eZDataType
 {
-	const EZ_DATATYPESTRING_MENUSTRING = 'menustring';
-	const EZ_DATATYPESTRING_MENUSTRING_MAX_LEN_FIELD = 'data_int1';
-	const EZ_DATATYPESTRING_MENUSTRING_MAX_LEN_VARIABLE = '_menustring_max_string_length_';
-	const EZ_DATATYPESTRING_MENUSTRING_DEFAULT_STRING_FIELD = 'data_text1';
-	const EZ_DATATYPESTRING_MENUSTRING_DEFAULT_STRING_VARIABLE = '_menustring_default_value_';
+	const DATA_TYPE_STRING = 'menustring';
+	const MAX_LEN_FIELD = 'data_int1';
+	const MAX_LEN_VARIABLE = '_menustring_max_string_length_';
+	const DEFAULT_STRING_FIELD = 'data_text1';
+	const DEFAULT_STRING_VARIABLE = '_menustring_default_value_';
     /*!
      Initializes with a string id and a description.
     */
     function MenuStringType()
     {
-        $this->eZDataType( MenuStringType::EZ_DATATYPESTRING_MENUSTRING, ezi18n( 'kernel/classes/datatypes', 'Menu line', 'Datatype name' ),
-                           array( 'serialize_supported' => true ) );
+        $this->eZDataType( MenuStringType::DATA_TYPE_STRING, ezi18n( 'kernel/classes/datatypes', 'Menu line', 'Datatype name' ),
+                           array( 'serialize_supported' => true,
+                                  'object_serialize_map' => array( 'data_text' => 'text' ) ) );
         $this->MaxLenValidator = new eZIntegerValidator();
     }
 
@@ -74,7 +70,7 @@ class MenuStringType extends eZDataType
                     }
                 }
             }
-            $maxLen = $classAttribute->attribute( MenuStringType::EZ_DATATYPESTRING_MENUSTRING_MAX_LEN_FIELD );
+            $maxLen = $classAttribute->attribute( MenuStringType::DATA_TYPE_STRING_MAX_LEN_FIELD );
             $textCodec = eZTextCodec::instance( false );
             if ( ($textCodec->strlen( $data ) <= $maxLen ) || ( $maxLen == 0 ) )
                 return eZInputValidator::STATE_ACCEPTED;
@@ -168,7 +164,7 @@ class MenuStringType extends eZDataType
     */
     function validateClassAttributeHTTPInput( $http, $base, $classAttribute )
     {
-        $maxLenName = $base . MenuStringType::EZ_DATATYPESTRING_MENUSTRING_MAX_LEN_VARIABLE . $classAttribute->attribute( 'id' );
+        $maxLenName = $base . MenuStringType::DATA_TYPE_STRING_MAX_LEN_VARIABLE . $classAttribute->attribute( 'id' );
         if ( $http->hasPostVariable( $maxLenName ) )
         {
             $maxLenValue = $http->postVariable( $maxLenName );
@@ -193,7 +189,7 @@ class MenuStringType extends eZDataType
     */
     function fixupClassAttributeHTTPInput( $http, $base, $classAttribute )
     {
-        $maxLenName = $base . MenuStringType::EZ_DATATYPESTRING_MENUSTRING_MAX_LEN_VARIABLE . $classAttribute->attribute( 'id' );
+        $maxLenName = $base . MenuStringType::DATA_TYPE_STRING_MAX_LEN_VARIABLE . $classAttribute->attribute( 'id' );
         if ( $http->hasPostVariable( $maxLenName ) )
         {
             $maxLenValue = $http->postVariable( $maxLenName );
@@ -208,18 +204,18 @@ class MenuStringType extends eZDataType
     */
     function fetchClassAttributeHTTPInput( $http, $base, $classAttribute )
     {
-        $maxLenName = $base . MenuStringType::EZ_DATATYPESTRING_MENUSTRING_MAX_LEN_VARIABLE . $classAttribute->attribute( 'id' );
-        $defaultValueName = $base . MenuStringType::EZ_DATATYPESTRING_MENUSTRING_DEFAULT_STRING_VARIABLE . $classAttribute->attribute( 'id' );
+        $maxLenName = $base . MenuStringType::DATA_TYPE_STRING_MAX_LEN_VARIABLE . $classAttribute->attribute( 'id' );
+        $defaultValueName = $base . MenuStringType::DATA_TYPE_STRING_DEFAULT_STRING_VARIABLE . $classAttribute->attribute( 'id' );
         if ( $http->hasPostVariable( $maxLenName ) )
         {
             $maxLenValue = $http->postVariable( $maxLenName );
-            $classAttribute->setAttribute( MenuStringType::EZ_DATATYPESTRING_MENUSTRING_MAX_LEN_FIELD, $maxLenValue );
+            $classAttribute->setAttribute( MenuStringType::DATA_TYPE_STRING_MAX_LEN_FIELD, $maxLenValue );
         }
         if ( $http->hasPostVariable( $defaultValueName ) )
         {
             $defaultValueValue = $http->postVariable( $defaultValueName );
 
-            $classAttribute->setAttribute( MenuStringType::EZ_DATATYPESTRING_MENUSTRING_DEFAULT_STRING_FIELD, $defaultValueValue );
+            $classAttribute->setAttribute( MenuStringType::DATA_TYPE_STRING_DEFAULT_STRING_FIELD, $defaultValueValue );
         }
         return true;
     }
@@ -322,13 +318,20 @@ class MenuStringType extends eZDataType
     */
     function serializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
     {
-        $maxLength = $classAttribute->attribute( MenuStringType::EZ_DATATYPESTRING_MENUSTRING_MAX_LEN_FIELD );
-        $defaultString = $classAttribute->attribute( MenuStringType::EZ_DATATYPESTRING_MENUSTRING_DEFAULT_STRING_FIELD );
-        $attributeParametersNode->appendChild( eZDOMDocument::createElementTextNode( 'max-length', $maxLength ) );
+        $maxLength = $classAttribute->attribute( self::MAX_LEN_FIELD );
+        $defaultString = $classAttribute->attribute( self::DEFAULT_STRING_FIELD );
+        $dom = $attributeParametersNode->ownerDocument;
+        $maxLengthNode = $dom->createElement( 'max-length', $maxLength );
+        $attributeParametersNode->appendChild( $maxLengthNode );
         if ( $defaultString )
-            $attributeParametersNode->appendChild( eZDOMDocument::createElementTextNode( 'default-string', $defaultString ) );
+        {
+            $defaultStringNode = $dom->createElement( 'default-string', $defaultString );
+        }
         else
-            $attributeParametersNode->appendChild( eZDOMDocument::createElementNode( 'default-string' ) );
+        {
+            $defaultStringNode = $dom->createElement( 'default-string' );
+        }
+        $attributeParametersNode->appendChild( $defaultStringNode );
     }
 
     /*!
@@ -336,75 +339,17 @@ class MenuStringType extends eZDataType
     */
     function unserializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
     {
-        $maxLength = $attributeParametersNode->elementTextContentByName( 'max-length' );
-        $defaultString = $attributeParametersNode->elementTextContentByName( 'default-string' );
-        $classAttribute->setAttribute( MenuStringType::EZ_DATATYPESTRING_MENUSTRING_MAX_LEN_FIELD, $maxLength );
-        $classAttribute->setAttribute( MenuStringType::EZ_DATATYPESTRING_MENUSTRING_DEFAULT_STRING_FIELD, $defaultString );
-    }
-    /*!
-     \param package
-     \param content attribute
-
-     \return a DOM representation of the content object attribute
-    */
-    function serializeContentObjectAttribute( $package, $objectAttribute )
-    {
-        $node = new eZDOMNode();
-
-        $node->setPrefix( 'ezobject' );
-        $node->setName( 'attribute' );
-        $node->appendAttribute( eZDOMDocument::createAttributeNode( 'id', $objectAttribute->attribute( 'id' ), 'ezremote' ) );
-        $node->appendAttribute( eZDOMDocument::createAttributeNode( 'identifier', $objectAttribute->contentClassAttributeIdentifier(), 'ezremote' ) );
-        $node->appendAttribute( eZDOMDocument::createAttributeNode( 'name', $objectAttribute->contentClassAttributeName() ) );
-        $node->appendAttribute( eZDOMDocument::createAttributeNode( 'type', $this->isA() ) );
-
-        $text = $objectAttribute->attribute( 'data_text' );
-       /*
-        $text = '<menu-text>' . MenuStringType::clean( $text, 'xml' ) . '</menu-text>';
-        $params["TrimWhiteSpace"] = true;
-        $textnode = eZXML::domTree( $text, $params );
-*/
-        if ( $text ) //is_object( $textnode ) )
-        {
-            #$root = $textnode->get_root();
-            $node->appendChild( eZDOMDocument::createElementTextNode( 'menu-text', MenuStringType::clean( $text, 'xml' ) ) );
-
-        }
-        
-        return $node;
+        $maxLength = $attributeParametersNode->getElementsByTagName( 'max-length' )->item( 0 )->textContent;
+        $defaultString = $attributeParametersNode->getElementsByTagName( 'default-string' )->item( 0 )->textContent;
+        $classAttribute->setAttribute( self::MAX_LEN_FIELD, $maxLength );
+        $classAttribute->setAttribute( self::DEFAULT_STRING_FIELD, $defaultString );
     }
 
-    /*!
-     \reimp
-     \param package
-     \param contentobject attribute object
-     \param ezdomnode object
-    */
-    function unserializeContentObjectAttribute( $package, $objectAttribute, $attributeNode )
-    {
-        $textNode = $attributeNode->elementByName( 'menu-text' );
-        if ( is_object( $textNode ) )
-            $text = $textNode->firstChild();
-
-        if ( is_object( $text ) )
-        {
-            $text = $text->content(); 
-            $patterns[0] = '/\xc2\xad/';
-            $patterns[1] = '/\xe2\x80\x8b/';
-
-            $replacements[0] = '<br>';
-            $replacements[1] = '<dash-br>';
-        
-            $text = preg_replace( $patterns, $replacements, $text );
-        
-            $objectAttribute->setAttribute( 'data_text', $text );
-        }
-    }
     /// \privatesection
     /// The max len validator
     var $MaxLenValidator;
 }
 
-eZDataType::register( MenuStringType::EZ_DATATYPESTRING_MENUSTRING, 'menustringtype' );
+eZDataType::register( MenuStringType::DATA_TYPE_STRING, 'menustringtype' );
 
 ?>
