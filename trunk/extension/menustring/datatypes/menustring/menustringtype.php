@@ -12,7 +12,7 @@ class MenuStringType extends eZDataType
     */
     function MenuStringType()
     {
-        $this->eZDataType( MenuStringType::DATA_TYPE_STRING, ezi18n( 'kernel/classes/datatypes', 'Menu line', 'Datatype name' ),
+        $this->eZDataType( MenuStringType::DATA_TYPE_STRING, ezpI18n::tr( 'kernel/classes/datatypes', 'Menu line', 'Datatype name' ),
                            array( 'serialize_supported' => true,
                                   'object_serialize_map' => array( 'data_text' => 'text' ) ) );
         $this->MaxLenValidator = new eZIntegerValidator();
@@ -64,7 +64,7 @@ class MenuStringType extends eZDataType
                 {
                     if ( $data == "" )
                     {
-                        $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes',
+                        $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes',
                                                                              'Input required.' ) );
                         return eZInputValidator::STATE_INVALID;
                     }
@@ -74,7 +74,7 @@ class MenuStringType extends eZDataType
             $textCodec = eZTextCodec::instance( false );
             if ( ($textCodec->strlen( $data ) <= $maxLen ) || ( $maxLen == 0 ) )
                 return eZInputValidator::STATE_ACCEPTED;
-            $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes',
+            $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes',
                                                                  'The input text is too long. The maximum number of characters allowed is %1.' ),
                                                          $maxLen );
         }
